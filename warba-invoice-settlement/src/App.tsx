@@ -1,6 +1,7 @@
+
 import React, { useEffect, useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Download, Upload, FileText, Search, Building2, Calendar, DollarSign, CheckCircle, AlertCircle, Tag, Trash2, ExternalLink } from 'lucide-react';
+import { Download, Upload, FileText, Search, Building2, Calendar, DollarSign, CheckCircle, AlertCircle, Trash2, ExternalLink } from 'lucide-react';
 
 const HERO_IMG = "https://images.unsplash.com/photo-1554224155-6726b3ff858f?q=80&w=1400&auto=format&fit=crop";
 const EMPTY_IMG = "https://images.unsplash.com/photo-1554224155-3a589877462c?q=80&w=1200&auto=format&fit=crop";
@@ -284,7 +285,13 @@ function generateTags(){
 }
 function csvEscape(v: string = ''){
   const needs = /[",\n]/.test(v);
-  // Replaced replaceAll with RegExp replace for ES2020 compatibility
   return needs ? '"' + v.replace(/"/g, '""') + '"' : v;
 }
-function uid()
+function uid(){
+  // crypto.randomUUID fallback for older environments
+  try {
+    // @ts-ignore
+    if (typeof crypto !== 'undefined' && crypto.randomUUID) return crypto.randomUUID();
+  } catch {}
+  return 'id-' + Math.random().toString(36).slice(2) + Date.now().toString(36);
+}
