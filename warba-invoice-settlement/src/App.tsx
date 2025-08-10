@@ -1,3 +1,8 @@
+function csvEscape(v: string = ''){
+  const needs = /[",\n]/.test(v);
+  // use RegExp replace instead of replaceAll (works on ES2020 and earlier)
+  return needs ? '"' + v.replace(/"/g, '""') + '"' : v;
+}
 
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
