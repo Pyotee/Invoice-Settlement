@@ -1,0 +1,23 @@
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root { color-scheme: light; }
+
+.container { max-width: 1200px; }
+.glass {
+  @apply bg-white/70 backdrop-blur border border-zinc-200;
+}
+.btn {
+  @apply inline-flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-medium border border-zinc-300 hover:shadow-sm transition;
+}
+.badge {
+  @apply inline-flex items-center gap-1 rounded-full border px-2 py-1 text-xs;
+}
+.modal-backdrop {
+  @apply fixed inset-0 bg-black/30;
+}
+.modal {
+  @apply fixed right-0 top-0 h-full w-full sm:w-[420px] bg-white shadow-xl;
+}
