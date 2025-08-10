@@ -1,12 +1,6 @@
-function csvEscape(v: string = ''){
-  const needs = /[",\n]/.test(v);
-  // use RegExp replace instead of replaceAll (works on ES2020 and earlier)
-  return needs ? '"' + v.replace(/"/g, '""') + '"' : v;
-}
-
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Download, Upload, FileText, Search, ListFilter, Building2, Calendar, DollarSign, CheckCircle, AlertCircle, Tag, Trash2, ExternalLink } from 'lucide-react';
+import { Download, Upload, FileText, Search, Building2, Calendar, DollarSign, CheckCircle, AlertCircle, Tag, Trash2, ExternalLink } from 'lucide-react';
 
 const HERO_IMG = "https://images.unsplash.com/photo-1554224155-6726b3ff858f?q=80&w=1400&auto=format&fit=crop";
 const EMPTY_IMG = "https://images.unsplash.com/photo-1554224155-3a589877462c?q=80&w=1200&auto=format&fit=crop";
@@ -27,9 +21,9 @@ type Invoice = {
 };
 
 const demoInvoices: Invoice[] = [
-  { id: crypto.randomUUID(), fileName: "WARBA-INV-2025-0001.pdf", size: 256000, uploadedAt: new Date().toISOString(), vendor: "Local Vendor A", amount: 1280.5, currency: "KWD", status: "Pending", tags: ["Office","Q3"], thumb: "https://images.unsplash.com/photo-1529070538774-1843cb3265df?q=80&w=500&auto=format&fit=crop" },
-  { id: crypto.randomUUID(), fileName: "WARBA-LOG-88421.pdf", size: 480000, uploadedAt: new Date(Date.now()-86400000*2).toISOString(), vendor: "Logistics Co", amount: 5420.0, currency: "KWD", status: "Approved", tags: ["Shipping"], thumb: "https://images.unsplash.com/photo-1520607162513-77705c0f0d4a?q=80&w=500&auto=format&fit=crop" },
-  { id: crypto.randomUUID(), fileName: "WARBA-IT-77122.pdf", size: 196000, uploadedAt: new Date(Date.now()-86400000*10).toISOString(), vendor: "Initech", amount: 220.99, currency: "KWD", status: "Rejected", tags: ["IT","Licenses"], thumb: "https://images.unsplash.com/photo-1520607162513-78b6b31f47c5?q=80&w=500&auto=format&fit=crop" },
+  { id: uid(), fileName: "WARBA-INV-2025-0001.pdf", size: 256000, uploadedAt: new Date().toISOString(), vendor: "Local Vendor A", amount: 1280.5, currency: "KWD", status: "Pending", tags: ["Office","Q3"], thumb: "https://images.unsplash.com/photo-1529070538774-1843cb3265df?q=80&w=500&auto=format&fit=crop" },
+  { id: uid(), fileName: "WARBA-LOG-88421.pdf", size: 480000, uploadedAt: new Date(Date.now()-86400000*2).toISOString(), vendor: "Logistics Co", amount: 5420.0, currency: "KWD", status: "Approved", tags: ["Shipping"], thumb: "https://images.unsplash.com/photo-1520607162513-77705c0f0d4a?q=80&w=500&auto=format&fit=crop" },
+  { id: uid(), fileName: "WARBA-IT-77122.pdf", size: 196000, uploadedAt: new Date(Date.now()-86400000*10).toISOString(), vendor: "Initech", amount: 220.99, currency: "KWD", status: "Rejected", tags: ["IT","Licenses"], thumb: "https://images.unsplash.com/photo-1520607162513-78b6b31f47c5?q=80&w=500&auto=format&fit=crop" },
 ];
 
 const formatBytes = (bytes: number) => {
@@ -55,7 +49,7 @@ function StatusBadge({ status }: {status: Invoice['status']}) {
     Rejected: 'border-rose-300 text-rose-700 bg-rose-50',
   } as const;
   const Icon = status === 'Approved' ? CheckCircle : status === 'Rejected' ? AlertCircle : Calendar;
-  return <span className={['badge', map[status]].join(' ')}><Icon className="h-3.5 w-3.5" /> {status}</span>;
+  return <span className={['inline-flex items-center gap-1 rounded-full border px-2 py-1 text-xs', map[status]].join(' ')}><Icon className="h-3.5 w-3.5" /> {status}</span>;
 }
 
 function FileDrop({ onFiles }: { onFiles: (files: File[]) => void }){
@@ -70,7 +64,7 @@ function FileDrop({ onFiles }: { onFiles: (files: File[]) => void }){
       <Upload className="mx-auto h-8 w-8 opacity-70" />
       <p className="mt-3 text-sm text-zinc-600">Drag & drop invoices here, or</p>
       <div className="mt-2">
-        <label className="btn cursor-pointer">
+        <label className="inline-flex items-center gap-2 cursor-pointer rounded-xl border px-4 py-2 hover:shadow-sm">
           <Upload className="h-4 w-4" /> Browse files
           <input type="file" multiple accept="application/pdf,image/*" className="hidden" onChange={(e)=> onFiles(Array.from(e.target.files||[]))} />
         </label>
@@ -102,7 +96,7 @@ export default function App(){
       let thumb: string | undefined;
       if (isImage) thumb = URL.createObjectURL(f);
       return {
-        id: crypto.randomUUID(),
+        id: uid(),
         fileName: f.name,
         size: f.size,
         uploadedAt: new Date().toISOString(),
@@ -149,7 +143,6 @@ export default function App(){
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-white to-zinc-100">
-      {/* Top */}
       <div className="relative overflow-hidden">
         <img src={HERO_IMG} alt="hero" className="absolute inset-0 h-full w-full object-cover opacity-20" />
         <div className="relative container mx-auto px-4 py-6 flex items-center justify-between">
@@ -160,15 +153,14 @@ export default function App(){
               <h1 className="text-2xl font-semibold">Invoice Settlement</h1>
             </div>
           </div>
-          <button className="btn" onClick={() => document.getElementById('upload-open')?.scrollIntoView({behavior:'smooth'})}>
+          <button className="inline-flex items-center gap-2 rounded-xl px-4 py-2 border hover:shadow-sm" onClick={() => document.getElementById('upload-open')?.scrollIntoView({behavior:'smooth'})}>
             <Upload className="h-4 w-4" /> Upload
           </button>
         </div>
       </div>
 
-      {/* Upload */}
       <section id="upload-open" className="container mx-auto px-4 py-6">
-        <div className="glass rounded-2xl p-6">
+        <div className="bg-white/70 backdrop-blur border border-zinc-200 rounded-2xl p-6">
           <motion.h2 initial={{opacity:0, y:10}} animate={{opacity:1, y:0}} className="text-xl font-semibold">Upload and archive your invoices</motion.h2>
           <div className="mt-4">
             <FileDrop onFiles={handleFiles} />
@@ -176,25 +168,24 @@ export default function App(){
         </div>
       </section>
 
-      {/* Archive */}
       <section className="container mx-auto px-4 pb-12">
-        <div className="glass rounded-2xl p-4">
+        <div className="bg-white/70 backdrop-blur border border-zinc-200 rounded-2xl p-4">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div className="text-lg font-medium">Archive</div>
             <div className="flex flex-wrap items-center gap-2">
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500" />
-                <input value={query} onChange={(e)=>setQuery(e.target.value)} placeholder="Search invoices, vendors, tags…" className="pl-9 pr-3 py-2 rounded-xl border w-64" />
+                <input value={query} onChange={(e)=>setQuery(e.target.value)} placeholder="Search invoices..." className="pl-9 pr-3 py-2 rounded-xl border w-64" />
               </div>
-              <div className="relative">
-                <select value={statusFilter} onChange={(e)=>setStatusFilter(e.target.value as any)} className="py-2 px-3 rounded-xl border">
-                  <option value="All">All Status</option>
-                  <option value="Approved">Approved</option>
-                  <option value="Pending">Pending</option>
-                  <option value="Rejected">Rejected</option>
-                </select>
-              </div>
-              <button className="btn" onClick={exportCSV}><Download className="h-4 w-4" /> Export CSV</button>
+              <select value={statusFilter} onChange={(e)=>setStatusFilter(e.target.value as any)} className="py-2 px-3 rounded-xl border">
+                <option value="All">All Status</option>
+                <option value="Approved">Approved</option>
+                <option value="Pending">Pending</option>
+                <option value="Rejected">Rejected</option>
+              </select>
+              <button className="inline-flex items-center gap-2 rounded-xl px-4 py-2 border hover:shadow-sm" onClick={exportCSV}>
+                <Download className="h-4 w-4" /> Export CSV
+              </button>
             </div>
           </div>
 
@@ -232,7 +223,7 @@ export default function App(){
               )) : (
                 <div className="flex flex-col items-center gap-3 py-14">
                   <img src={EMPTY_IMG} className="w-full max-w-sm rounded-2xl object-cover opacity-80" />
-                  <div className="text-sm text-zinc-600">No invoices match your search. Try clearing filters or upload new files.</div>
+                  <div className="text-sm text-zinc-600">No invoices match your search.</div>
                 </div>
               )}
             </div>
@@ -240,14 +231,13 @@ export default function App(){
         </div>
       </section>
 
-      {/* Details side modal */}
       {open && selected && (
         <>
-          <div className="modal-backdrop" onClick={()=>setOpen(false)} />
-          <aside className="modal p-5 overflow-y-auto">
+          <div className="fixed inset-0 bg-black/30" onClick={()=>setOpen(false)} />
+          <aside className="fixed right-0 top-0 h-full w-full sm:w-[420px] bg-white shadow-xl p-5 overflow-y-auto">
             <div className="flex items-center justify-between">
               <h3 className="text-lg font-semibold flex items-center gap-2"><FileText className="h-5 w-5" /> {selected.fileName}</h3>
-              <button className="btn" onClick={()=>setOpen(false)}>Close</button>
+              <button className="inline-flex items-center gap-2 rounded-xl px-4 py-2 border hover:shadow-sm" onClick={()=>setOpen(false)}>Close</button>
             </div>
             <div className="mt-4 grid grid-cols-2 gap-3">
               <Info label="Vendor" value={selected.vendor} icon={<Building2 className="h-4 w-4" />} />
@@ -257,7 +247,7 @@ export default function App(){
             </div>
             {selected.tags?.length ? (
               <div className="mt-3 flex flex-wrap items-center gap-2">
-                {selected.tags.map(t => <span key={t} className="badge border-zinc-300">{t}</span>)}
+                {selected.tags.map(t => <span key={t} className="inline-flex items-center gap-1 rounded-full border px-2 py-1 text-xs">{t}</span>)}
               </div>
             ) : null}
             <div className="mt-4 rounded-xl overflow-hidden border bg-zinc-50">
@@ -267,7 +257,7 @@ export default function App(){
                 </div>
               )}
             </div>
-            <a href="#" className="inline-flex items-center gap-2 text-sm underline mt-3"><ExternalLink className="h-4 w-4" /> Open original (demo link)</a>
+            <a href="#" className="inline-flex items-center gap-2 text-sm underline mt-3"><ExternalLink className="h-4 w-4" /> Open original</a>
           </aside>
         </>
       )}
@@ -294,5 +284,7 @@ function generateTags(){
 }
 function csvEscape(v: string = ''){
   const needs = /[",\n]/.test(v);
-  return needs ? '"' + v.replaceAll('"','""') + '"' : v;
+  // Replaced replaceAll with RegExp replace for ES2020 compatibility
+  return needs ? '"' + v.replace(/"/g, '""') + '"' : v;
 }
+function uid()
